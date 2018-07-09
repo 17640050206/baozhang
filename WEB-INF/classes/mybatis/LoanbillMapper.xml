@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.erp.dao.LoanbillMapper">
+	<select id="searchBill" resultType="com.erp.bean.Loanbill">
+			select * from loanbill l where l.dr=0  and l.pk_psn=${userid}
+	<if test="year !=null ">
+		and	 l.year=${year} 
+	</if>
+	<if test="month !=null ">
+		 and l.month=${month}
+	</if>
+	<if test="billno !=null ">
+		 and l.vbillno=#{billno}
+	</if>
+	<if test="pbillstatus !=null ">
+      and l.pbillstatus=#{pbillstatus}
+    </if>
+    order by ts desc limit #{indexPage},#{pageSize}
+	</select>
+	
+		<select id="getCount" resultType="int">
+			select count(*) from loanbill l where l.dr=0  and l.pk_psn=${userid}
+	<if test="year !=null ">
+		and	 l.year=${year} 
+	</if>
+	<if test="month !=null ">
+		 and l.month=${month}
+	</if>
+	<if test="billno !=null ">
+		 and l.vbillno=#{billno}
+	</if>
+	<if test="pbillstatus !=null ">
+      and l.pbillstatus=#{pbillstatus}
+    </if>
+	</select>
+	
+		<select id="searchBillExap" resultType="com.erp.bean.Loanbill">
+			select * from loanbill l where l.dr=0  and l.pk_psn=${userid}
+      and l.pbillstatus in (${pbillstatus})
+    order by ts desc limit 0,13
+	</select>
+	
+	<select id="getLoanbillById" parameterType="int" resultType="com.erp.bean.Loanbill">
+		select l.*,u.user_name as psnname from loanbill l,user u where l.pk_psn =u.userid and l.pk_loanbill=#{billid}
+	</select>
+	<insert id="insert" parameterType="com.erp.bean.Loanbill" >
+		insert into loanbill  values(default,#{billtypecode},#{vbillno},#{billdate},#{lzje},#{pk_psn},#{deptid},#{digest},#{dr},#{pbillstatus},#{year},#{month},#{account},#{zffs},#{bank},#{appreason},#{transferdate},#{xmbm},#{pk_project},0,#{ts});
+	</insert>
+	
+	<select id="getPKbybillno" parameterType="string" resultType="int">
+		select pk_loanbill  from loanbill  where vbillno=#{vbillno};
+	</select>
+	
+	<insert id="insertPaydetail" parameterType="com.erp.bean.Paydetail" >
+		insert into paydetail  values(default,#{vendorcode},#{vendorname},#{fkje},#{digest},#{pk_loanbill},#{bankname},#{account},0);
+	</insert>
+	
+	<select id="getProjectByBm" parameterType="string" resultType="com.erp.bean.Project">
+		select *  from project  where projectcode=#{xmbm};
+	</select>
+	<select id="getVendor" parameterType="com.erp.bean.Vendor" resultType="com.erp.bean.Vendor">
+		select *  from vendor  where pk_project=#{pk_project} and vendorcode=#{vendorcode};
+	</select>
+	<select id="getPaydetailVos" parameterType="int" resultType="com.erp.bean.Paydetail">
+		select *  from paydetail where pk_loanbill=#{pk_loanbill} and dr=0;
+	</select>
+	<update id="updatePbillstatus" parameterType="com.erp.bean.Loanbill">
+		update loanbill set pbillstatus=#{pbillstatus} where pk_loanbill=#{pk_loanbill};
+	</update>
+	<update id="deleteBill" parameterType="int">
+		update loanbill set dr=1 where pk_loanbill=#{pk_loanbill}
+	</update>
+	<insert id="insertExpitem" parameterType="com.erp.bean.Expitem" >
+		insert into expitem  values(default,#{pk_loanbill},#{area},#{daynum},#{hotelcost},#{transcost},#{othercost},#{sum},#{digest},#{datefrom},#{dr});
+	</insert>
+    <select id="getExpitemVos" parameterType="int" resultType="com.erp.bean.Expitem">
+		select *  from expitem where pk_loanbill=#{pk_loanbill} and dr=0;
+	</select>	
+	<update id="updateBill" parameterType="com.erp.bean.Loanbill">
+		update loanbill set digest=#{digest},lzje=#{lzje},account=#{account},zffs=#{zffs},bank=#{bank},appreason=#{appreason},transferdate=#{transferdate},xmbm=#{xmbm},pk_project=#{pk_project},zyje=#{zyje} where pk_loanbill=#{pk_loanbill};
+	</update>
+	<delete id="deletePaydetails" parameterType="int" >
+		delete  from paydetail where pk_loanbill=#{pk_loanbill};
+	</delete>
+	
+	<delete id="deleteExpitems" parameterType="int" >
+		delete  from expitem where pk_loanbill=#{pk_loanbill};
+	</delete>
+	
+	<insert id="insertBorroeitem" parameterType="com.erp.bean.Borrowitem" >
+		insert into borrowitem  values(default,#{billno},#{pk_loanbill},#{jkje},#{ycxje},#{wcxje},#{ybje},#{digest},#{dr});
+	</insert>
+	  <select id="getBorrowitemVos" parameterType="int" resultType="com.erp.bean.Borrowitem">
+		select *  from borrowitem where pk_loanbill=#{pk_loanbill} and dr=0;
+	</select>	
+	
+	<delete id="deleteBorrowitems" parameterType="int" >
+		delete  from borrowitem where pk_loanbill=#{pk_loanbill};
+	</delete>
+	
+	
+	  <select id="getZyjeByBillno" parameterType="string" resultType="com.erp.bean.Borrowitem">
+		select sum(ybje) as ycxje from borrowitem where billno=#{billno} and dr=0;
+	</select>	
+	
+	
+	  <select id="getLoanbillByno" parameterType="string" resultType="com.erp.bean.Loanbill">
+		select *  from loanbill where vbillno=#{vbillno} and dr=0;
+	</select>	
+	
+	  <select id="getYhjeByBillno" parameterType="string" resultType="com.erp.bean.Cashbill">
+		select sum(ybje) as yhje from cashbill where billno=#{billno} and dr=0;
+	</select>	
+	
+	
+	<insert id="insertCashbill" parameterType="com.erp.bean.Cashbill" >
+		insert into cashbill  values(default,#{pk_loanbill},#{billno},#{account},#{ybje},#{digest},#{jkje},#{yhje},#{whje},#{deptid},#{dr});
+	</insert>
+	
+	 <select id="getCashbillVos" parameterType="int" resultType="com.erp.bean.Cashbill">
+		select *  from cashbill where pk_loanbill=#{pk_loanbill} and dr=0;
+	</select>
+	
+	<delete id="deleteCashbills" parameterType="int" >
+		delete  from cashbill where pk_loanbill=#{pk_loanbill};
+	</delete>
+</mapper>

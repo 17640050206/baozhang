@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.erp.dao.UserMapper">
+	<select id="login" parameterType="com.erp.bean.User" resultType="com.erp.bean.User">
+		select u.userid,u.usercode,u.deptid,u.password,u.job,u.user_name,u.default_role,j.user_role as user_role from user u left join job j on j.jobid=u.job 
+		 where u.usercode=#{usercode} and u.password=#{password} ;
+	</select>
+	
+	<select id="getBilltype" parameterType="com.erp.bean.User" resultType="com.erp.bean.Job">
+		select * from job j,user u where j.jobid = u.job and u.usercode=#{usercode};
+	</select>
+	<update id="updatepassword" parameterType="com.erp.bean.User">
+		update user set password=#{password} where userid=#{userid};
+	</update>
+	<select id="getUser_role" parameterType="int"  resultType="string">
+		select * from job where jobid=#{job};
+	</select>
+	<update id="updateDefaultrole" parameterType="com.erp.bean.User">
+		update user set default_role=#{default_role} where userid=#{userid};
+	</update>
+	<select id="getUserById" parameterType="int" resultType="com.erp.bean.User">
+		select u.*,d.deptname from user u,dept d where u.deptid=d.deptid and  u.userid=#{userid};
+	</select>
+	<select id="getUserBydeptId" parameterType="com.erp.bean.User" resultType="com.erp.bean.User">
+		select * from user u,job j where u.job=j.jobid and u.deptid=#{deptid} and j.user_role in('A','CA','AC') and j.level=#{level};
+	</select>
+</mapper>

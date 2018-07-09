@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.erp.dao.GrantMapper">
+	<select id="getGrantList" parameterType="com.erp.bean.User" resultType="com.erp.bean.Grant">
+		select * from tgrant where pk_psn=#{userid} and dr=0 order by ts desc
+	</select>
+	<update id="deleteGrant" parameterType="int">
+		update tgrant set dr=1 where pk_grant=#{id}
+	</update>
+	
+	<insert id="insertGrant" parameterType="com.erp.bean.Grant">
+		insert into tgrant values(default,#{billtypecode},#{datefrom},#{dateto},#{pk_psn},#{pk_grantpsn},#{dr},#{ts},#{psndept},#{grantpsndept});
+	</insert>
+	<select id="check" parameterType="com.erp.bean.Grant" resultType="com.erp.bean.Grant">
+		select * from tgrant where billtypecode=#{billtypecode}  and dr=0 and
+		 ((datefrom&lt;#{datefrom} and dateto&gt;#{dateto}) or (dateto between #{datefrom} and #{dateto}) or (datefrom between #{datefrom} and #{dateto}) )
+	</select>
+	<select id="getGrantsByGrantedPsn" parameterType="int" resultType="com.erp.bean.Grant">
+		select * from tgrant where pk_grantpsn=#{pk_grantpsn}  and dr=0 and date_format(now(),'%Y-%m-%d') between datefrom and dateto;
+
+	</select>
+</mapper>

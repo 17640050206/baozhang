@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.erp.dao.WorkflowMapper">
+	<select id="getBtdListExce" parameterType="com.erp.bean.User" resultType="com.erp.bean.Workflow">
+			select w.*,u.user_name as checkmanname from workflow w ,loanbill l,user u where w.billno = l.vbillno and l.pk_psn=${userid} and u.userid=w.checkman
+and w.checkresult=2  and w.ischeck='Y' and w.dr=0 ORDER BY w.ts DESC LIMIT 0,5;
+	</select>
+	
+	<select id="getBtdList" parameterType="com.erp.bean.User" resultType="com.erp.bean.Workflow">
+		select w.*,u.user_name as checkmanname from workflow w ,loanbill l,user u where w.billno = l.vbillno and l.pk_psn=${userid} and u.userid=w.checkman
+and w.checkresult=2  and w.ischeck='Y' and w.dr=0 ORDER BY w.ts DESC;
+	</select>
+	
+	<select id="searchFlowBills"  resultType="com.erp.bean.Workflow">
+		select * from workflow where ischeck!='Y'  and level=${level} and billtypecode in (${billtype}) and senddate between #{datefrom} and #{dateto} and dr=0
+		<if test="billno !=null ">
+		    and billno = #{billno}
+		</if>
+		order by ts desc 
+	</select>
+	<select id="getFlowlistByBillid" parameterType="int" resultType="com.erp.bean.Workflow">
+		select * from workflow where billid=#{billid}
+	</select>
+	<insert id="insert1" parameterType="com.erp.bean.Workflow">
+		insert into workflow (pk_pubwork,billtypecode,billid,billno,senderman,senddate,checkresult,level,checknote,ischeck,dr,ts) values(default,#{billtypecode},#{billid},#{billno},#{senderman},#{senddate},#{checkresult},#{level},#{checknote},#{ischeck},0,#{ts});
+	</insert>
+	<update id="updateFlow" parameterType="com.erp.bean.Workflow">
+		update workflow set checkman=#{checkman},checkdate=#{checkdate},checknote=#{checknote},checkresult=#{checkresult},ischeck=#{ischeck},level=#{level},ts=#{ts} where pk_pubwork=#{pk_pubwork} and dr=0;
+	</update>
+	<select id="getFlowById" parameterType="int" resultType="com.erp.bean.Workflow"> 
+		select * from workflow where pk_pubwork = #{pk_pubwork} and dr=0;
+	</select>
+	<update id="deleteFlow" parameterType="int">
+		update workflow set dr=1 where billid=#{pk_loanbill} and dr=0;
+	</update>
+	<select id="getCount" resultType="int">
+		select count(*) from workflow where ischeck!='Y'  and level=${level} and billtypecode in (${billtype}) and senddate between #{datefrom} and #{dateto} and dr=0
+		<if test="billno !=null ">
+		    and billno = #{billno}
+		</if>
+	</select>
+</mapper>

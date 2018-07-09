@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.erp.dao.PubmessageMapper">
+	<select id="getpubmessage"  resultType="com.erp.bean.Pubmessage">
+		select * from pubmessage order by ts desc LIMIT 0,5;
+	</select>
+	<select id="getMessagebyid" parameterType="int" resultType="com.erp.bean.Pubmessage">
+		select * from pubmessage where pk_messageinfo =#{pk_messageinfo} ;
+	</select>
+	
+	<select id="getallmessage" resultType="com.erp.bean.Pubmessage">
+		select p.*,u.user_name as psnname from pubmessage p,user u where p.pk_psn=u.userid order by p.ts desc;
+	</select>
+	<insert id="insertMessage"  parameterType="com.erp.bean.Pubmessage">
+        insert into pubmessage  values(default,#{title},#{context},#{pk_psn},#{senddate},#{deptid},#{ts})	
+     </insert>
+</mapper>
